@@ -21,15 +21,15 @@ A comprehensive mobile application that evaluates employee well-being through a 
 ## 🛠 Tech Stack
 
 ### Backend (Laravel API)
-- **Framework**: Laravel 8.75
-- **PHP**: 7.3+ / 8.0
+- **Framework**: Laravel 12
+- **PHP**:  8.2.12
 - **Authentication**: OAuth2 (Laravel Passport)
 - **Database**: MySQL
 - **AI Integration**: Google Gemini AI API
 - **Security**: Token-based authentication
 
 ### Mobile App (Flutter)
-- **Framework**: Flutter 3.3.3
+- **Framework**: Flutter 3.38.4
 - **State Management**: GetX
 - **Architecture**: MVC pattern
 - **Storage**: flutter_securestorage for tokens
