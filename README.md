@@ -1,4 +1,4 @@
-# Happynance - Employee Well-Being AI Evaluation App
+# HappyNation - Employee Well-Being AI Evaluation App
 
 A comprehensive mobile application that evaluates employee well-being through a short questionnaire and uses AI to generate clear diagnostic reports with scores, risks, and personalized recommendations.
 
@@ -79,7 +79,7 @@ php artisan key:generate
 Edit `.env` file with your settings:
 
 ```env
-APP_NAME=Happynance
+APP_NAME=HappyNation
 APP_ENV=local
 APP_KEY=base64:your_app_key_here
 APP_DEBUG=true
@@ -109,7 +109,7 @@ PASSPORT_CLIENT_SECRET=your_passport_client_secret
 
 ```bash
 # Create database
-mysql -u root -p -e "CREATE DATABASE happynance;"
+mysql -u root -p -e "CREATE DATABASE HappyNation;"
 
 # Run migrations and seeders
 php artisan migrate --seed
@@ -175,11 +175,11 @@ flutter run -d chrome
 After seeding, you can use these credentials:
 
 **Admin User:**
-- Email: `admin@happynance.com`
+- Email: `admin@HappyNation.com`
 - Password: `password123`
 
 **Employee User:**
-- Email: `employee@happynance.com`
+- Email: `employee@HappyNation.com`
 - Password: `password123`
 
 ### Using the App
