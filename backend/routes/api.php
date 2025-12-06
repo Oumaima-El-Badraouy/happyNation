@@ -6,6 +6,8 @@ use App\Http\Controllers\API\AuthController;
 // ===========================
 // Routes for AuthController
 // ===========================
-Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:api')->post('/logout', [AuthController::class, 'logout']);
+Route::middleware('auth:api')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']); // خاص admin
+    Route::post('/logout', [AuthController::class, 'logout']);
+});

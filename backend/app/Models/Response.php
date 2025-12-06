@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App/Models/ResponseAnswer;
+use App\Models\ResponseAnswer;
 class Response extends Model
 {
      protected $fillable = ['user_id'];
