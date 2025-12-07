@@ -10,16 +10,26 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+     public function index()
+    {
+        $user = Auth::user();
+        if ($user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+$users = User::where('role', 'user')->orderBy('name')->get();
+        return response()->json($users);
+    }
     // ===========================
     //Register)
     // ===========================
  public function register(Request $request)
 {
-    if (!Auth::check() || Auth::user()->role !== 'admin') {
-        return response()->json([
-            'message' => 'Only admins can create new accounts.'
-        ], 403);
-    }
+   // <!-- if (!Auth::check() || Auth::user()->role !== 'admin') {
+        //return response()->json([
+       //     'message' => 'Only admins can create new accounts.'
+       // ], 403);
+    //} -->
 
     $request->validate([
         'name' => 'required|string|max:255',
