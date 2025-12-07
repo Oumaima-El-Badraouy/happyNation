@@ -7,6 +7,11 @@ class ResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ai = ModalRoute.of(context)!.settings.arguments as Map;
 
+    // S'assurer que recommendations est une liste
+    final recommendations = ai['recommendations'] is List
+        ? ai['recommendations'] as List
+        : [ai['recommendations']];
+
     return Scaffold(
       appBar: AppBar(title: Text("Your Results")),
       body: Padding(
@@ -16,7 +21,10 @@ class ResultPage extends StatelessWidget {
             Text("Stress: ${ai['stress_score']}", style: TextStyle(fontSize: 18)),
             Text("Motivation: ${ai['motivation_score']}", style: TextStyle(fontSize: 18)),
             Text("Satisfaction: ${ai['satisfaction_score']}", style: TextStyle(fontSize: 18)),
-            Text("Risk level: ${ai['risk_level']}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              "Risk level: ${ai['risk_level']}",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             
             SizedBox(height: 20),
             Text("Summary:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -24,14 +32,18 @@ class ResultPage extends StatelessWidget {
 
             SizedBox(height: 20),
             Text("Recommendations:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            for (var r in ai['recommendations']) Text("- $r"),
+            for (var r in recommendations) Text("- $r"),
 
             SizedBox(height: 30),
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.pop(context); // revient à la page précédente (History)
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  "/user/history",
+                  (route) => false, // supprime toutes les pages précédentes de la pile
+                );
               },
-             
+              icon: Icon(Icons.arrow_back),
               label: Text("Return to History"),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15),
