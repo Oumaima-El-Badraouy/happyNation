@@ -34,7 +34,7 @@ $users = User::where('role', 'user')->orderBy('name')->get();
     $request->validate([
         'name' => 'required|string|max:255',
         'email'=> 'required|email|unique:users',
-        'password'=> 'required|string|min:6|confirmed',
+        'password'=> 'required|string|min:6',
     ]);
 
     $user = User::create([

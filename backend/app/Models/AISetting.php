@@ -15,7 +15,12 @@ class AISetting extends Model
         'model'
     ];
 
+  
     protected $casts = [
-        'risk_levels' => 'array',
-    ];
+    'stress_weight' => 'float',
+    'motivation_weight' => 'float',
+    'satisfaction_weight' => 'float',
+     'risk_levels' => 'array',
+];
+
 }

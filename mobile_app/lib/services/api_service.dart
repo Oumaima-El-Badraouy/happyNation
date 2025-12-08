@@ -12,7 +12,7 @@ class ApiService {
 static Future<dynamic> getQuestions(AuthService auth) async {
   final token = await auth.getToken();
   final res = await http.get(
-    Uri.parse("$baseUrl/questions"),
+    Uri.parse("$baseUrl/Admin/questions"),
     headers: _headers(token),
   );
 
@@ -21,8 +21,17 @@ static Future<dynamic> getQuestions(AuthService auth) async {
   }
   return null;
 }
-
-
+static Future<dynamic> getDetails(int id,AuthService auth) async {
+  final token = await auth.getToken();
+  final res = await http.get(
+    Uri.parse("$baseUrl/questions/$id"),
+    headers: _headers(token),
+  );
+  if (res.statusCode == 200) {
+    return jsonDecode(res.body); 
+  }
+  return null;
+}
   static Future<bool> createQuestion(Map<String, dynamic> payload, AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.post(
@@ -32,7 +41,6 @@ static Future<dynamic> getQuestions(AuthService auth) async {
     );
     return res.statusCode == 200 || res.statusCode == 201;
   }
-
   static Future<bool> updateQuestion(int id, Map<String, dynamic> payload, AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.put(
@@ -97,15 +105,39 @@ print('answers est : $answers');
     return [];
   }
 
-  static Future<bool> createUser(Map<String, dynamic> body, AuthService auth) async {
+  // lib/services/api_service.dart
+static Future<bool> createUser(Map<String, dynamic> body, AuthService auth) async {
+  try {
     final token = await auth.getToken();
+    print('🔑 Token: ${token?.substring(0, 50)}...');
+    print('📝 Body: $body');
+    
+    final url = Uri.parse("$baseUrl/register"); // Essayer cette route
+    print('🌐 URL: $url');
+    
     final res = await http.post(
-      Uri.parse("$baseUrl/users"),
+      url,
       headers: _headers(token),
       body: jsonEncode(body),
     );
-    return res.statusCode == 200 || res.statusCode == 201;
+    
+    print('📡 Status Code: ${res.statusCode}');
+    print('📡 Response Body: ${res.body}');
+    print('📡 Headers: ${res.headers}');
+    
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      print('✅ Utilisateur créé avec succès');
+      return true;
+    } else {
+      print('❌ Erreur création: ${res.statusCode} - ${res.body}');
+      return false;
+    }
+  } catch (e, stackTrace) {
+    print('🔥 Erreur dans createUser: $e');
+    print('📋 StackTrace: $stackTrace');
+    return false;
   }
+}
 
   static Future<bool> updateUser(int id, Map<String, dynamic> body, AuthService auth) async {
     final token = await auth.getToken();
@@ -151,7 +183,7 @@ print('answers est : $answers');
   static Future<Map<String, dynamic>> getAiSettings(AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.get(
-      Uri.parse("$baseUrl/admin/aiconfig"),
+      Uri.parse("$baseUrl/admin/ai-settings"),
       headers: _headers(token),
     );
     if (res.statusCode == 200) {
@@ -163,7 +195,7 @@ print('answers est : $answers');
   static Future<bool> updateAiSettings(Map<String, dynamic> body, AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.put(
-      Uri.parse("$baseUrl/admin/aiconfig"),
+      Uri.parse("$baseUrl/admin/ai-settings"),
       headers: _headers(token),
       body: jsonEncode(body),
     );

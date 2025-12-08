@@ -13,13 +13,14 @@ use App\Http\Controllers\API\StatisticsController;
 // ===========================
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']); // خاص admin
+    Route::post('/register', action: [AuthController::class, 'register']); // خاص admin
     Route::post('/logout', [AuthController::class, 'logout']);
 
 });
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/questions', [QuestionController::class, 'index']);
+    Route::get('/Admin/questions',[QuestionController::class, 'indexAdmin']);
     Route::get('/questions/{id}', [QuestionController::class, 'show']);
     Route::post('/questions', [QuestionController::class, 'store']);
     Route::put('/questions/{id}', [QuestionController::class, 'update']);

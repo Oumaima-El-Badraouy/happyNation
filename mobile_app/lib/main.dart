@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
 
@@ -15,6 +16,10 @@ import 'pages/admin/manage_questions_page.dart';
 import 'pages/admin/ai_config_page.dart';
 
 void main() {
+   if (!kIsWeb) {
+    WidgetsFlutterBinding.ensureInitialized();
+  }
+  
   runApp(const HappyNationApp());
 }
 

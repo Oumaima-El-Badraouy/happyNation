@@ -222,7 +222,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               title: "Configuration IA",
               isSelected: _selectedMenu == 4,
               onTap: () {
-                Navigator.pushNamed(context, '/ai-config');
+                Navigator.pushNamed(context, '/admin/ai-config');
               },
             ),
 

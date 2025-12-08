@@ -19,7 +19,7 @@ public function index()
     $user = Auth::user();
 
     // 1) Get frequency (supposons qu'il y a 1 row seulement)
-    $frequency = Frequency::first(); 
+    $frequency = Frequency::first();
     if(!$frequency) {
         return response()->json(['message' => 'Frequency not set'], 400);
     }
@@ -59,6 +59,15 @@ public function index()
         'message' => 'Pas de questionnaire pour aujourd’hui'
     ]);
 }
+public function indexAdmin()
+{
+    $user = Auth::user();
+if ($user->role !== 'admin') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+        $questions = Question::all();
+        return response()->json($questions);
+}
 
 
     // ===========================
@@ -82,6 +91,28 @@ public function index()
         $question = Question::create($request->all());
         return response()->json($question, 201);
     }
+
+    public function details($id)
+{
+    $user = Auth::user();
+    if ($user->role !== 'admin') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    // Get question
+    $question = Question::findOrFail($id);
+
+    return response()->json([
+        'id'        => $question->id,
+        'text'      => $question->text,
+        'type'      => $question->type,
+        'options'   => $question->options,   // array
+        'order'     => $question->order,
+        'active'    => $question->active,
+        'created_at'=> $question->created_at->format('Y-m-d H:i'),
+        'updated_at'=> $question->updated_at->format('Y-m-d H:i'),
+    ]);
+}
 
     // ===========================
     // Show a single question
