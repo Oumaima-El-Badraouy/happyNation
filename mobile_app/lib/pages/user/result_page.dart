@@ -39,7 +39,7 @@ class ResultPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
-                  "/user/history",
+                  "/responses/history",
                   (route) => false, // supprime toutes les pages précédentes de la pile
                 );
               },

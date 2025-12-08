@@ -9,17 +9,19 @@ class ApiService {
   // -------------------------
   // Questions
   // -------------------------
-  static Future<List<dynamic>> getQuestions(AuthService auth) async {
-    final token = await auth.getToken();
-    final res = await http.get(
-      Uri.parse("$baseUrl/questions"),
-      headers: _headers(token),
-    );
-    if (res.statusCode == 200) {
-      return jsonDecode(res.body) as List<dynamic>;
-    }
-    return [];
+static Future<dynamic> getQuestions(AuthService auth) async {
+  final token = await auth.getToken();
+  final res = await http.get(
+    Uri.parse("$baseUrl/questions"),
+    headers: _headers(token),
+  );
+
+  if (res.statusCode == 200) {
+    return jsonDecode(res.body); // peut être Map ou List
   }
+  return null;
+}
+
 
   static Future<bool> createQuestion(Map<String, dynamic> payload, AuthService auth) async {
     final token = await auth.getToken();

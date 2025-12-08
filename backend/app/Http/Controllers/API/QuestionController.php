@@ -1,23 +1,65 @@
 <?php
 
 namespace App\Http\Controllers\API;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Question;
-
+use App\Models\Frequency;
+use Carbon\Carbon;
 class QuestionController extends Controller
 {
     // ===========================
     // List all questions
     // ===========================
-    public function index()
-    {
-        $user = Auth::user();
-        $questions = Question::where('active', true)->orderBy('order')->get();
+
+
+public function index()
+{
+    $user = Auth::user();
+
+    // 1) Get frequency (supposons qu'il y a 1 row seulement)
+    $frequency = Frequency::first(); 
+    if(!$frequency) {
+        return response()->json(['message' => 'Frequency not set'], 400);
+    }
+
+    $today = Carbon::now();
+    $showQuestions = false;
+
+    // 2) Check if today matches frequency
+    switch($frequency->frequency) {
+        case 'daily':
+            $showQuestions = true; // every day
+            break;
+        case 'weekly':
+            // Par exemple chaque lundi
+            if($today->isMonday()) {
+                $showQuestions = true;
+            }
+            break;
+        case 'monthly':
+            // Par exemple 1er du mois
+            if($today->day == 1) {
+                $showQuestions = true;
+            }
+            break;
+    }
+
+    // 3) Return questions si frequency match
+    if($showQuestions) {
+        $questions = Question::where('active', true)
+            ->orderBy('order')
+            ->get();
         return response()->json($questions);
     }
+
+    // 4) Sinon return message
+    return response()->json([
+        'message' => 'Pas de questionnaire pour aujourd’hui'
+    ]);
+}
+
 
     // ===========================
     // Create a new question

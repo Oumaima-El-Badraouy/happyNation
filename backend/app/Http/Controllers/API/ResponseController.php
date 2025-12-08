@@ -128,12 +128,20 @@ $gemini = Http::withHeaders([
     // Get History of a user
     // ==========================
     public function history()
-    {
-        $history = Response::where('user_id', Auth::id())
-            ->with('answers.question')
-            ->orderBy('created_at', 'desc')
-            ->get();
+{
+    $history = Response::where('user_id', Auth::id())
+        ->with('aiReport') // <-- غير AI report
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'created_at' => $item->created_at,
+                'ai_report' => json_decode($item->aiReport->diagnostic_json ?? '{}'),
+            ];
+        });
 
-        return response()->json($history);
-    }
+    return response()->json($history);
+}
+
 }

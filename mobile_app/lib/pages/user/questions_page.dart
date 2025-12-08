@@ -1,3 +1,4 @@
+// lib/pages/questions_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/services/api_service.dart';
@@ -11,113 +12,201 @@ class QuestionsPage extends StatefulWidget {
 }
 
 class _QuestionsPageState extends State<QuestionsPage> {
-  List questions = [];
+  List<Map<String, dynamic>> questions = [];
   Map<String, dynamic> answers = {};
   bool loading = true;
+  String? message;
 
   // -------------------------
-  // Load questions from API
+  // Charger questions
   // -------------------------
-  loadQuestions() async {
+  Future<void> loadQuestions() async {
     final auth = Provider.of<AuthService>(context, listen: false);
 
     try {
       final data = await ApiService.getQuestions(auth);
+
+      if (data is Map<String, dynamic> && data.containsKey('message')) {
+        // Pas de questionnaire aujourd'hui
+        setState(() {
+          message = data['message'].toString();
+          questions = [];
+          loading = false;
+        });
+      } else if (data is List) {
+        if (data.isEmpty) {
+          setState(() {
+            message = "Pas de questionnaire pour aujourd'hui";
+            questions = [];
+            loading = false;
+          });
+        } else {
+          // Convertir chaque item en Map
+          questions = data.map<Map<String, dynamic>>((item) {
+            return Map<String, dynamic>.from(item);
+          }).toList();
+          setState(() {
+            loading = false;
+            message = null;
+          });
+        }
+      } else {
+        setState(() {
+          message = "Format de données inattendu";
+          questions = [];
+          loading = false;
+        });
+      }
+    } catch (e) {
       setState(() {
-        questions = data;
+        message = "Erreur de chargement: ${e.toString()}";
+        questions = [];
         loading = false;
       });
-    } catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to load questions: $e")),
-      );
     }
   }
 
   // -------------------------
-  // Submit answers to API
+  // Soumettre réponses
   // -------------------------
+  Future<void> submitAnswers() async {
+    if (answers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Veuillez répondre à au moins une question")),
+      );
+      return;
+    }
 
- submitAnswers() async {
-  final auth = Provider.of<AuthService>(context, listen: false);
+    final auth = Provider.of<AuthService>(context, listen: false);
 
-  try {
-    final response = await ApiService.sendResponses(answers, auth);
-
-    // Assure-toi que c'est un Map<String, dynamic>
-    final aiReport = Map<String, dynamic>.from(response['ai_report']);
-
-    Navigator.pushNamed(
-      context,
-      "/user/result",
-      arguments: aiReport,
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Failed to submit answers: $e")),
-    );
+    try {
+      final response = await ApiService.sendResponses(answers, auth);
+      if (response.containsKey('ai_report')) {
+        final aiReport = Map<String, dynamic>.from(response['ai_report']);
+        Navigator.pushNamed(context, "/user/result", arguments: aiReport);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Réponses soumises avec succès!")),
+        );
+        setState(() {
+          loading = true;
+          answers.clear();
+        });
+        await loadQuestions();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Échec de la soumission: ${e.toString()}")),
+      );
+    }
   }
-}
-
-
 
   @override
   void initState() {
     super.initState();
-    // Post frame callback to use Provider safely
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadQuestions();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => loadQuestions());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Questions")),
+      appBar: AppBar(
+        title: const Text("Questionnaire du jour"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                loading = true;
+                answers.clear();
+                message = null;
+              });
+              loadQuestions();
+            },
+          ),
+        ],
+      ),
       body: loading
-          ? Center(child: CircularProgressIndicator())
-          : questions.isEmpty
-              ? Center(child: Text("No questions available"))
+          ? const Center(child: CircularProgressIndicator())
+          : message != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.info_outline, size: 80, color: Colors.grey.shade600),
+                        const SizedBox(height: 20),
+                        Text(
+                          message!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade700),
+                        ),
+                        const SizedBox(height: 30),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/responses/history");
+                          },
+                          icon: const Icon(Icons.history),
+                          label: const Text("Voir l'historique"),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               : ListView.builder(
-                  padding: EdgeInsets.all(16),
-                  itemCount: questions.length + 1, // +1 for submit button
+                  padding: const EdgeInsets.all(16),
+                  itemCount: questions.length + 1,
                   itemBuilder: (context, index) {
                     if (index == questions.length) {
-                      return ElevatedButton(
-                        onPressed: submitAnswers,
-                        child: Text("Submit"),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: ElevatedButton(
+                          onPressed: submitAnswers,
+                          child: const Text("Soumettre"),
+                        ),
                       );
                     }
 
                     final q = questions[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(q['text'],
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                        if (q['type'] == 'text')
-                          TextField(
-                            onChanged: (val) =>
-                                answers[q['id'].toString()] = val,
-                            decoration: InputDecoration(hintText: "Type your answer"),
-                          )
-                        else if (q['type'] == 'likert' && q['options'] != null)
-                          ...List.generate(q['options'].length, (i) {
-                            final option = q['options'][i];
-                            return RadioListTile(
-                              title: Text(option),
-                              value: option,
-                              groupValue: answers[q['id'].toString()],
-                              onChanged: (val) {
-                                setState(() {
-                                  answers[q['id'].toString()] = val;
-                                });
-                              },
-                            );
-                          }),
-                        SizedBox(height: 20),
-                      ],
+                    final qId = q['id'].toString();
+                    final qText = q['text'].toString();
+                    final qType = q['type'].toString();
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(qText, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 12),
+                            if (qType == 'text')
+                              TextField(
+                                onChanged: (val) => setState(() => answers[qId] = val),
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  hintText: "Votre réponse...",
+                                  border: OutlineInputBorder(),
+                                ),
+                              )
+                            else if (qType == 'likert' && q['options'] is List)
+                              ...List<Widget>.from(
+                                (q['options'] as List).map((opt) => RadioListTile<String>(
+                                      title: Text(opt.toString()),
+                                      value: opt.toString(),
+                                      groupValue: answers[qId],
+                                      onChanged: (val) => setState(() => answers[qId] = val),
+                                    )),
+                              ),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 ),

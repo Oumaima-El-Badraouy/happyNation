@@ -50,7 +50,7 @@ class HappyNationApp extends StatelessWidget {
           // User pages
           "/questions": (context) => const QuestionsPage(),
           "/user/result": (context) => const ResultPage(),
-          "/user/history": (context) => const HistoryPage(),
+          "/responses/history": (context) => const HistoryPage(),
 
           // Admin pages
           "/admin/dashboard": (context) => const AdminDashboardPage(),

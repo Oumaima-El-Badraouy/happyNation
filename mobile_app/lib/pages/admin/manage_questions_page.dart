@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/services/api_service.dart';
-import 'package:mobile_app/services/auth_service.dart'; // <-- add this
 import 'package:provider/provider.dart';
+import 'package:mobile_app/services/api_service.dart';
+import 'package:mobile_app/services/auth_service.dart';
 
 class ManageQuestionsPage extends StatefulWidget {
   const ManageQuestionsPage({super.key});
@@ -15,37 +15,38 @@ class _ManageQuestionsPageState extends State<ManageQuestionsPage> {
   bool loading = true;
 
   loadQuestions() async {
-    final auth = Provider.of<AuthService>(context, listen: false); // <-- get AuthService instance
-    questions = await ApiService.getQuestions(auth); // <-- pass auth
+    final auth = Provider.of<AuthService>(context, listen: false);
+    questions = await ApiService.getQuestions(auth); // ✅ passer auth
     loading = false;
     setState(() {});
   }
 
   deleteQuestion(id) async {
-    final auth = Provider.of<AuthService>(context, listen: false); // <-- get AuthService instance
-    await ApiService.deleteQuestion(id, auth); // <-- pass auth
+    final auth = Provider.of<AuthService>(context, listen: false);
+    await ApiService.deleteQuestion(id, auth); // ✅ passer auth
     loadQuestions();
   }
 
   @override
   void initState() {
     super.initState();
-    loadQuestions();
+    // utiliser addPostFrameCallback pour éviter Provider avant le build
+    WidgetsBinding.instance.addPostFrameCallback((_) => loadQuestions());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Manage Questions")),
+      appBar: AppBar(title: const Text("Manage Questions")),
       body: loading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
                 for (var q in questions)
                   ListTile(
-                    title: Text(q['text']),
+                    title: Text(q['text'] ?? ''),
                     trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () => deleteQuestion(q['id']),
                     ),
                   )
