@@ -8,6 +8,8 @@ environment:
   sdk: ^3.10.3
 
 dependencies:
+
+  fl_chart: ^0.70.0
   flutter:
     sdk: flutter
 
