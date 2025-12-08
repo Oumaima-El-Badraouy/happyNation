@@ -88,7 +88,7 @@ print('answers est : $answers');
   static Future<List<dynamic>> getUsers(AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.get(
-      Uri.parse("$baseUrl/admin/users"),
+      Uri.parse("$baseUrl/users"),
       headers: _headers(token),
     );
     if (res.statusCode == 200) {
@@ -100,7 +100,7 @@ print('answers est : $answers');
   static Future<bool> createUser(Map<String, dynamic> body, AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.post(
-      Uri.parse("$baseUrl/admin/users"),
+      Uri.parse("$baseUrl/users"),
       headers: _headers(token),
       body: jsonEncode(body),
     );
@@ -110,7 +110,7 @@ print('answers est : $answers');
   static Future<bool> updateUser(int id, Map<String, dynamic> body, AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.put(
-      Uri.parse("$baseUrl/admin/users/$id"),
+      Uri.parse("$baseUrl/users/$id"),
       headers: _headers(token),
       body: jsonEncode(body),
     );
@@ -120,7 +120,7 @@ print('answers est : $answers');
   static Future<bool> deleteUser(int id, AuthService auth) async {
     final token = await auth.getToken();
     final res = await http.delete(
-      Uri.parse("$baseUrl/admin/users/$id"),
+      Uri.parse("$baseUrl/users/$id"),
       headers: _headers(token),
     );
     return res.statusCode == 200 || res.statusCode == 204;
@@ -129,17 +129,21 @@ print('answers est : $answers');
   // -------------------------
   // Admin - Dashboard / Stats
   // -------------------------
-  static Future<Map<String, dynamic>> getDashboardStats(AuthService auth) async {
-    final token = await auth.getToken();
-    final res = await http.get(
-      Uri.parse("$baseUrl/admin/stats"),
-      headers: _headers(token),
-    );
-    if (res.statusCode == 200) {
-      return jsonDecode(res.body) as Map<String, dynamic>;
-    }
-    throw Exception("Failed to load stats: ${res.statusCode}");
+ static Future<Map<String, dynamic>> getDashboardStats(AuthService auth) async {
+  final token = await auth.getToken();
+  print("Token: $token"); // debug
+  final res = await http.get(
+    Uri.parse("$baseUrl/admin/statistics/global"),
+    headers: _headers(token),
+  );
+  print("Status code: ${res.statusCode}");
+  print("Body: ${res.body}");
+  if (res.statusCode == 200) {
+    return jsonDecode(res.body) as Map<String, dynamic>;
   }
+  throw Exception("Failed to load stats: ${res.statusCode}");
+}
+
 
   // -------------------------
   // AI Config
@@ -179,4 +183,7 @@ print('answers est : $answers');
     }
     return headers;
   }
+
+
+  
 }

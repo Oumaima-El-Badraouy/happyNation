@@ -6,6 +6,7 @@ use App\Http\Controllers\API\QuestionController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\ResponseController;
 use App\Http\Controllers\API\AIConfigController;
+use App\Http\Controllers\API\StatisticsController;
 
 // ===========================
 // Routes for AuthController
@@ -43,5 +44,10 @@ Route::middleware('auth:api')->group(function () {
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/admin/ai-settings', [AIConfigController::class, 'getSettings']);
     Route::post('/admin/ai-settings', [AIConfigController::class, 'updateSettings']);
+});
+
+
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/admin/statistics/global', [StatisticsController::class, 'globalStats']);
 });
 

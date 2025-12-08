@@ -1,20 +1,46 @@
-namespace App\Http\Controllers\Admin;
+<?php
+namespace App\Http\Controllers\API;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\ResponseAnswer;
 use App\Models\AIReport;
-use Illuminate\Http\Request;
 
 class StatisticsController extends Controller
 {
     public function globalStats()
     {
-        // Average scores
-        $avgStress = AIReport::avg('diagnostic_json->stress_score');
-        $avgMotivation = AIReport::avg('diagnostic_json->motivation_score');
-        $avgSatisfaction = AIReport::avg('diagnostic_json->satisfaction_score');
+        $user = Auth::user();
 
-        // Count responses
+        if ($user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Récupérer toutes les entrées JSON
+        $reports = AIReport::all()->pluck('diagnostic_json');
+
+        // Décoder chaque JSON et récupérer les scores
+        $stressScores = $reports->map(function($r) {
+            $data = json_decode($r, true);
+            return $data['stress_score'] ?? 0;
+        });
+
+        $motivationScores = $reports->map(function($r) {
+            $data = json_decode($r, true);
+            return $data['motivation_score'] ?? 0;
+        });
+
+        $satisfactionScores = $reports->map(function($r) {
+            $data = json_decode($r, true);
+            return $data['satisfaction_score'] ?? 0;
+        });
+
+        // Calcul des moyennes
+        $avgStress = round($stressScores->avg(), 2);
+        $avgMotivation = round($motivationScores->avg(), 2);
+        $avgSatisfaction = round($satisfactionScores->avg(), 2);
+
+        // Nombre total de réponses
         $totalResponses = ResponseAnswer::count();
 
         return response()->json([
