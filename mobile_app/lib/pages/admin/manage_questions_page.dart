@@ -58,7 +58,14 @@ class _ManageQuestionsPageState extends State<ManageQuestionsPage> {
         selectedFrequency = value;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Fréquence mise à jour : $value")),
+        SnackBar(
+          content: Text("Fréquence mise à jour : $value"),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       );
     }
   }
@@ -277,21 +284,31 @@ class _ManageQuestionsPageState extends State<ManageQuestionsPage> {
   }
 
   // ========================
-  // UI
+  // UI améliorée
   // ========================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text("Gestion des Questions", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Gestion des Questions",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 2,
+        elevation: 0,
         shadowColor: Colors.grey.withOpacity(0.1),
         foregroundColor: Colors.black87,
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: loadQuestions, tooltip: "Rafraîchir"),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: loadQuestions,
+            tooltip: "Rafraîchir",
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -303,52 +320,378 @@ class _ManageQuestionsPageState extends State<ManageQuestionsPage> {
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          const SizedBox(height: 16),
+          // -------- Header avec fréquence --------
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Titre et compteur
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Questions",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          "${questions.length} questions",
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.quiz,
+                        color: Colors.blue,
+                        size: 32,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                
+                // Carte fréquence
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.purple.shade100),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.purple,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.schedule,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Fréquence des questionnaires",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _getFrequencyText(selectedFrequency),
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: selectedFrequency,
+                            icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                            items: frequencyOptions.map((v) {
+                              return DropdownMenuItem(
+                                value: v,
+                                child: Text(
+                                  _getFrequencyText(v),
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              if (val != null) updateFrequency(val);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // -------- Liste des questions --------
+          Expanded(
+            child: loadingQuestions
+                ? _buildLoadingState()
+                : questions.isEmpty
+                    ? _buildEmptyState()
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Toutes les questions",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ...questions.map((q) {
+                              return _buildQuestionCard(q);
+                            }).toList(),
+                            const SizedBox(height: 80), // Espace pour le FAB
+                          ],
+                        ),
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
 
-          // -------- Dropdown unique --------
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildQuestionCard(Map q) {
+    bool isActive = q['active'] ?? true;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Fréquence", style: TextStyle(fontSize: 16)),
-              DropdownButton<String>(
-                value: selectedFrequency,
-                items: frequencyOptions.map((v) {
-                  return DropdownMenuItem(value: v, child: Text(v));
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) updateFrequency(val);
-                },
+              // Header avec type et statut
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.shade100),
+                    ),
+                    child: Text(
+                      (q['type'] ?? 'text').toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: isActive ? Colors.green : Colors.grey,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Texte de la question
+              Text(
+                q['text'] ?? "",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Footer avec ordre et actions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "Ordre: #${q['order'] ?? 0}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, size: 20),
+                        onPressed: () => openQuestionForm(question: q),
+                        tooltip: "Modifier",
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.blue.shade50,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, size: 20),
+                        onPressed: () => deleteQuestion(q['id']),
+                        tooltip: "Supprimer",
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.red.shade50,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
 
+  String _getFrequencyText(String frequency) {
+    switch (frequency) {
+      case 'daily':
+        return "Quotidien";
+      case 'weekly':
+        return "Hebdomadaire";
+      case 'monthly':
+        return "Mensuel";
+      default:
+        return frequency;
+    }
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            "Chargement des questions...",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.quiz_outlined,
+              size: 60,
+              color: Colors.grey,
+            ),
+          ),
           const SizedBox(height: 24),
-
-          // -------- Questions --------
-          loadingQuestions
-              ? const Center(child: CircularProgressIndicator())
-              : questions.isEmpty
-                  ? const Center(child: Text("Aucune question trouvée"))
-                  : Column(
-                      children: questions.map((q) {
-                        return Card(
-                          child: ListTile(
-                            title: Text(q['text'] ?? ""),
-                            subtitle: Text("Type: ${q['type'] ?? ''} - Ordre: ${q['order'] ?? 0}"),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(icon: const Icon(Icons.edit), onPressed: () => openQuestionForm(question: q)),
-                                IconButton(icon: const Icon(Icons.delete), onPressed: () => deleteQuestion(q['id'])),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+          const Text(
+            "Aucune question trouvée",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            "Commencez par créer votre première question",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => openQuestionForm(),
+            icon: const Icon(Icons.add),
+            label: const Text("Créer une question"),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
         ],
       ),
     );
