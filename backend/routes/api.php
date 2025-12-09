@@ -7,6 +7,7 @@ use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\ResponseController;
 use App\Http\Controllers\API\AIConfigController;
 use App\Http\Controllers\API\StatisticsController;
+use App\Http\Controllers\API\FrequencyController;
 
 // ===========================
 // Routes for AuthController
@@ -39,7 +40,6 @@ Route::middleware('auth:api')->group(function () {
 Route::middleware('auth:api')->group(function () {
     Route::post('/responses', [ResponseController::class, 'store']);
     Route::get('/responses/history', [ResponseController::class, 'history']);
-
 });
 
 Route::middleware(['auth:api'])->group(function () {
@@ -47,8 +47,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/admin/ai-settings', [AIConfigController::class, 'updateSettings']);
 });
 
-
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/admin/statistics/global', [StatisticsController::class, 'globalStats']);
 });
 
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/frequencies', [FrequencyController::class, 'index']);
+    Route::put('/frequencies', [FrequencyController::class, 'update']);
+});

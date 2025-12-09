@@ -210,14 +210,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               },
             ),
             _drawerMenuItem(
-              icon: Icons.analytics,
-              title: "Rapports",
-              isSelected: _selectedMenu == 3,
-              onTap: () {
-                Navigator.pushNamed(context, '/admin/reports');
-              },
-            ),
-            _drawerMenuItem(
               icon: Icons.settings,
               title: "Configuration IA",
               isSelected: _selectedMenu == 4,

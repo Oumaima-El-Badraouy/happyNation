@@ -194,7 +194,7 @@ static Future<bool> createUser(Map<String, dynamic> body, AuthService auth) asyn
 
   static Future<bool> updateAiSettings(Map<String, dynamic> body, AuthService auth) async {
     final token = await auth.getToken();
-    final res = await http.put(
+    final res = await http.post(
       Uri.parse("$baseUrl/admin/ai-settings"),
       headers: _headers(token),
       body: jsonEncode(body),
@@ -215,7 +215,27 @@ static Future<bool> createUser(Map<String, dynamic> body, AuthService auth) asyn
     }
     return headers;
   }
-
-
   
+
+
+static Future<List<dynamic>> getFrequencies(AuthService auth) async {
+  final token = await auth.getToken();
+  final res = await http.get(
+    Uri.parse("$baseUrl/frequencies"),
+    headers: _headers(token),
+  );
+  if (res.statusCode == 200) {
+    return jsonDecode(res.body) as List<dynamic>;
+  }
+  return [];
+}
+static Future<bool> updateFrequency( String frequency, AuthService auth) async {
+  final token = await auth.getToken();
+  final res = await http.put(
+    Uri.parse("$baseUrl/frequencies"),
+    headers: _headers(token),
+    body: jsonEncode({"frequency": frequency}),
+  );
+  return res.statusCode == 200;
+}
 }

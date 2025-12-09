@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\API;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Frequency;
@@ -7,26 +8,37 @@ use Illuminate\Support\Facades\Auth;
 
 class FrequencyController extends Controller
 {
-     public function index()
+    // ==========================
+    // Liste toutes les fréquences
+    // ==========================
+    public function index()
     {
-        $frequency = Frequency::all();
-        
-        return response()->json($frequency);
+        $frequencies = Frequency::all();
+        return response()->json($frequencies);
     }
-
-    public function update(Request $request, $id)
+    // ==========================
+    // Mettre à jour une fréquence
+    // ==========================
+    public function update(Request $request, )
     {
         $user = Auth::user();
         if ($user->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $frequencys = Frequency::findOrFail($id);
+        $frequency = Frequency::first();
+
         $request->validate([
-            'frequency' => 'required|enum["daily", "weekly", "monthly"]',
+            'frequency' => 'required|string|in:daily,weekly,monthly',
         ]);
 
-        $frequencys->update($request->all());
-        return response()->json($frequencys);
+        $frequency->update([
+            'frequency' => $request->input('frequency')
+        ]);
+
+        return response()->json([
+            'message' => 'Frequency updated successfully',
+            'frequency' => $frequency
+        ]);
     }
 }
