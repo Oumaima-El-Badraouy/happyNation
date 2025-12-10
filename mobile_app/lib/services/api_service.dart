@@ -6,10 +6,23 @@ import 'auth_service.dart';
 class ApiService {
   static const String baseUrl = "http://127.0.0.1:8000/api";
 
+
   // -------------------------
   // Questions
   // -------------------------
-static Future<dynamic> getQuestions(AuthService auth) async {
+  static Future<dynamic> getQuestions(AuthService auth) async {
+  final token = await auth.getToken();
+  final res = await http.get(
+    Uri.parse("$baseUrl/questions"),
+    headers: _headers(token),
+  );
+
+  if (res.statusCode == 200) {
+    return jsonDecode(res.body); // peut être Map ou List
+  }
+  return null;
+}
+static Future<dynamic> getQuestionsAdmin(AuthService auth) async {
   final token = await auth.getToken();
   final res = await http.get(
     Uri.parse("$baseUrl/Admin/questions"),

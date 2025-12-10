@@ -32,7 +32,7 @@ class _ManageQuestionsPageState extends State<ManageQuestionsPage> {
     final auth = Provider.of<AuthService>(context, listen: false);
     setState(() => loadingQuestions = true);
 
-    final data = await ApiService.getQuestions(auth);
+    final data = await ApiService.getQuestionsAdmin(auth);
     setState(() {
       questions = data is List ? data : [];
       loadingQuestions = false;

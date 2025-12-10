@@ -1,196 +1,4 @@
-// import 'package:flutter/material.dart';
-// import 'package:mobile_app/services/api_service.dart';
-// import 'package:provider/provider.dart';
-// import 'package:mobile_app/services/auth_service.dart';
-
-// class HistoryPage extends StatefulWidget {
-//   const HistoryPage({super.key});
-
-//   @override
-//   State<HistoryPage> createState() => _HistoryPageState();
-// }
-
-// class _HistoryPageState extends State<HistoryPage> {
-//   bool loading = true;
-//   List history = [];
-
-//   loadHistory() async {
-//     final auth = Provider.of<AuthService>(context, listen: false);
-//     history = await ApiService.getHistory(auth);
-//     loading = false;
-//     setState(() {});
-//   }
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     WidgetsBinding.instance.addPostFrameCallback((_) => loadHistory());
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.grey[100],
-//       appBar: AppBar(
-//         title: Text(" Results History"),
-//         centerTitle: true,
-//         backgroundColor: Colors.deepOrange,
-//       ),
-//       body: loading
-//           ? Center(child: CircularProgressIndicator())
-//           : history.isEmpty
-//               ? Center(
-//                   child: Text(
-//                     "No AI results yet",
-//                     style: TextStyle(fontSize: 16, color: Colors.grey),
-//                   ),
-//                 )
-//               : ListView.builder(
-//                   padding: EdgeInsets.all(14),
-//                   itemCount: history.length,
-//                   itemBuilder: (_, i) {
-//                     final item = history[i];
-//                     final ai = item["ai_report"];
-
-//                     return Container(
-//                       margin: EdgeInsets.only(bottom: 14),
-//                       padding: EdgeInsets.all(18),
-//                       decoration: BoxDecoration(
-//                         color: Colors.white,
-//                         borderRadius: BorderRadius.circular(14),
-//                         boxShadow: [
-//                           BoxShadow(
-//                             color: Colors.black12,
-//                             blurRadius: 6,
-//                             offset: Offset(0, 3),
-//                           )
-//                         ],
-//                       ),
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           // Title + Date Row
-//                           Row(
-//                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                             children: [
-//                               Text(
-//                                 "Result #${item['id']}",
-//                                 style: TextStyle(
-//                                   fontSize: 18,
-//                                   fontWeight: FontWeight.bold,
-//                                 ),
-//                               ),
-//                               Row(
-//                                 children: [
-//                                   Icon(Icons.calendar_today,
-//                                       size: 16, color: Colors.grey),
-//                                   SizedBox(width: 6),
-//                                   Text(
-//                                     item["created_at"]
-//                                         .toString()
-//                                         .substring(0, 10),
-//                                     style: TextStyle(
-//                                       fontSize: 14,
-//                                       color: Colors.grey[700],
-//                                     ),
-//                                   ),
-//                                 ],
-//                               ),
-//                             ],
-//                           ),
-
-//                           SizedBox(height: 12),
-//                           Divider(),
-//                           SizedBox(height: 12),
-
-//                           // Scores Section
-//                           Row(
-//                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                             children: [
-//                               _scoreBox(
-//                                 icon: Icons.warning_amber,
-//                                 label: "Stress",
-//                                 value: ai["stress_score"],
-//                                 color: Colors.redAccent,
-//                               ),
-//                               _scoreBox(
-//                                 icon: Icons.flash_on,
-//                                 label: "Motivation",
-//                                 value: ai["motivation_score"],
-//                                 color: Colors.blueAccent,
-//                               ),
-//                               _scoreBox(
-//                                 icon: Icons.sentiment_satisfied_alt,
-//                                 label: "Satisfaction",
-//                                 value: ai["satisfaction_score"],
-//                                 color: Colors.green,
-//                               ),
-//                             ],
-//                           ),
-
-//                           SizedBox(height: 20),
-
-//                           // Risk level badge
-//                           Container(
-//                             padding: EdgeInsets.symmetric(
-//                                 horizontal: 10, vertical: 6),
-//                             decoration: BoxDecoration(
-//                               color: _riskColor(ai["risk_level"]),
-//                               borderRadius: BorderRadius.circular(10),
-//                             ),
-//                             child: Text(
-//                               "Risk: ${ai["risk_level"].toString().toUpperCase()}",
-//                               style: TextStyle(
-//                                 color: Colors.white,
-//                                 fontWeight: FontWeight.bold,
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     );
-//                   },
-//                 ),
-//     );
-//   }
-
-//   // Score Box Widget
-//   Widget _scoreBox({
-//     required IconData icon,
-//     required String label,
-//     required dynamic value,
-//     required Color color,
-//   }) {
-//     return Column(
-//       children: [
-//         Icon(icon, color: color, size: 28),
-//         SizedBox(height: 6),
-//         Text(
-//           "$value",
-//           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//         ),
-//         Text(
-//           label,
-//           style: TextStyle(fontSize: 13, color: Colors.grey),
-//         ),
-//       ],
-//     );
-//   }
-
-//   // Risk color
-//   Color _riskColor(String risk) {
-//     switch (risk.toLowerCase()) {
-//       case "high":
-//         return Colors.red;
-//       case "medium":
-//         return Colors.orange;
-//       default:
-//         return Colors.green;
-//     }
-//   }
-// }
-// (
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:mobile_app/services/api_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/services/auth_service.dart';
@@ -211,32 +19,69 @@ class _HistoryPageState extends State<HistoryPage> {
   List<double> motivationScores = [];
   List<double> satisfactionScores = [];
   List<String> dates = [];
+  
+  Map<String, dynamic> userProfile = {};
+  bool loadingProfile = false;
 
-  loadHistory() async {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadHistory();
+      loadUserProfile();
+    });
+  }
+
+  // ========================
+  // Load User Profile
+  // ========================
+  Future<void> loadUserProfile() async {
+    try {
+      setState(() => loadingProfile = true);
+      final auth = Provider.of<AuthService>(context, listen: false);
+     final profile = await auth.getProfile();
+setState(() {
+  userProfile = profile ?? {};  // Map vide si null
+  loadingProfile = false;
+});
+
+if (profile != null) {
+  print('👤 Profil chargé: ${profile['name']}');
+} else {
+  print('❌ Profil vide ou introuvable');
+}
+   } catch (e) {
+      print('❌ Erreur chargement profil: $e');
+      setState(() => loadingProfile = false);
+    }
+  }
+
+  // ========================
+  // Load History
+  // ========================
+  Future<void> loadHistory() async {
     final auth = Provider.of<AuthService>(context, listen: false);
     try {
+      setState(() => loading = true);
       history = await ApiService.getHistory(auth);
       print('📊 Histoire chargée: ${history.length} éléments');
-      
-      // Debug: afficher la structure des données
-      if (history.isNotEmpty) {
-        print('📋 Premier élément: ${history.first}');
-        if (history.first["ai_report"] != null) {
-          print('🔍 Structure ai_report: ${history.first["ai_report"]}');
-        }
-      }
-      
       prepareChartData();
     } catch (e) {
       print('❌ Erreur lors du chargement: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur de chargement: ${e.toString()}")),
+        SnackBar(
+          content: Text("Erreur de chargement: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() => loading = false);
     }
   }
 
+  // ========================
+  // Prepare Chart Data
+  // ========================
   void prepareChartData() {
     stressScores.clear();
     motivationScores.clear();
@@ -246,13 +91,15 @@ class _HistoryPageState extends State<HistoryPage> {
     if (history.isEmpty) return;
     
     // Trier par date (plus récent en premier)
-    history.sort((a, b) {
-      try {
-        return (b['created_at'] as String).compareTo(a['created_at'] as String);
-      } catch (e) {
-        return 0;
-      }
-    });
+    try {
+      history.sort((a, b) {
+        final aDate = a['created_at']?.toString() ?? '';
+        final bDate = b['created_at']?.toString() ?? '';
+        return bDate.compareTo(aDate);
+      });
+    } catch (e) {
+      print('⚠️ Erreur tri dates: $e');
+    }
     
     // Prendre les 7 derniers résultats
     final recentHistory = history.take(7).toList().reversed.toList();
@@ -278,12 +125,6 @@ class _HistoryPageState extends State<HistoryPage> {
         dates.add(dateStr);
       }
     }
-    
-    print('📈 Scores préparés:');
-    print('   Stress: $stressScores');
-    print('   Motivation: $motivationScores');
-    print('   Satisfaction: $satisfactionScores');
-    print('   Dates: $dates');
   }
 
   double _safeExtractScore(Map<String, dynamic> ai, String key) {
@@ -315,186 +156,202 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => loadHistory());
+  // ========================
+  // Navigation Functions
+  // ========================
+  Future<void> _logout(BuildContext context) async {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Déconnexion"),
+        content: const Text("Voulez-vous vraiment vous déconnecter ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Annuler"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Déconnexion"),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true) {
+      await auth.logout();
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    }
   }
 
+  
+
+  void _navigateToSettings(BuildContext context) {
+    Navigator.pushNamed(context, '/settings');
+  }
+
+  // ========================
+  // UI
+  // ========================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-    
-      body: loading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    "Chargement de l'historique...",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+      appBar: AppBar(
+        title: const Text(
+          "Historique des Résultats",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        shadowColor: Colors.grey.withOpacity(0.1),
+        foregroundColor: Colors.black87,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              loadHistory();
+              loadUserProfile();
+            },
+            tooltip: "Rafraîchir",
+          ),
+        ],
+      ),
+      drawer: _buildDrawer(),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    if (loading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text(
+              "Chargement de l'historique...",
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 16,
               ),
-            )
-          : history.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.history_toggle_off,
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "Aucun résultat pour le moment",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "Complétez un questionnaire pour voir vos résultats",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (history.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return Column(
+      children: [
+        // Header avec statistiques
+        _buildHeader(),
+        
+        // Onglets
+        _buildTabs(),
+        
+        // Contenu selon l'onglet
+        Expanded(
+          child: _selectedTab == 0 ? _buildChartsTab() : _buildListTab(),
+        ),
+      ],
+    );
+  }
+
+  // ========================
+  // Header Section
+  // ========================
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 24, 13, 187).withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            "Votre Évolution",
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            "${history.length} résultats enregistrés",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withOpacity(0.9),
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // Mini statistiques
+          if (history.isNotEmpty && history.last["ai_report"] != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _miniStat(
+                  label: "Dernier Stress",
+                  value: _safeExtractScoreString(
+                    history.last["ai_report"], 
+                    "stress_score"
                   ),
-                )
-              : Column(
-                  children: [
-                    // En-tête avec statistiques
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color.fromARGB(255, 24, 13, 187).withOpacity(0.3),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Votre Évolution",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "${history.length} résultats enregistrés",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          
-                          // Mini statistiques
-                          if (history.isNotEmpty && history.last["ai_report"] != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _miniStat(
-                                  label: "Dernier Stress",
-                                  value: _safeExtractScoreString(
-                                    history.last["ai_report"], 
-                                    "stress_score"
-                                  ),
-                                  icon: Icons.warning_amber,
-                                  color: Colors.redAccent,
-                                ),
-                                _miniStat(
-                                  label: "Dernière Motivation",
-                                  value: _safeExtractScoreString(
-                                    history.last["ai_report"], 
-                                    "motivation_score"
-                                  ),
-                                  icon: Icons.flash_on,
-                                  color: Colors.blueAccent,
-                                ),
-                                _miniStat(
-                                  label: "Dernière Satisfaction",
-                                  value: _safeExtractScoreString(
-                                    history.last["ai_report"], 
-                                    "satisfaction_score"
-                                  ),
-                                  icon: Icons.sentiment_satisfied,
-                                  color: Colors.greenAccent,
-                                ),
-                              ],
-                            )
-                          else
-                            Text(
-                              "Données incomplètes",
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Onglets
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _tabButton(
-                              text: "📊 Graphiques",
-                              isSelected: _selectedTab == 0,
-                              onTap: () => setState(() => _selectedTab = 0),
-                            ),
-                          ),
-                          Expanded(
-                            child: _tabButton(
-                              text: "📋 Liste",
-                              isSelected: _selectedTab == 1,
-                              onTap: () => setState(() => _selectedTab = 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Contenu selon l'onglet
-                    Expanded(
-                      child: _selectedTab == 0 
-                          ? _buildChartsTab()
-                          : _buildListTab(),
-                    ),
-                  ],
+                  icon: Icons.warning_amber,
+                  color: Colors.redAccent,
                 ),
+                _miniStat(
+                  label: "Dernière Motivation",
+                  value: _safeExtractScoreString(
+                    history.last["ai_report"], 
+                    "motivation_score"
+                  ),
+                  icon: Icons.flash_on,
+                  color: Colors.blueAccent,
+                ),
+                _miniStat(
+                  label: "Dernière Satisfaction",
+                  value: _safeExtractScoreString(
+                    history.last["ai_report"], 
+                    "satisfaction_score"
+                  ),
+                  icon: Icons.sentiment_satisfied,
+                  color: Colors.greenAccent,
+                ),
+              ],
+            )
+          else
+            Text(
+              "Données incomplètes",
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
+                fontSize: 14,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -502,17 +359,17 @@ class _HistoryPageState extends State<HistoryPage> {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: Colors.white, size: 24),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -529,12 +386,43 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  // ========================
+  // Tabs Section
+  // ========================
+  Widget _buildTabs() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _tabButton(
+              text: "📊 Graphiques",
+              isSelected: _selectedTab == 0,
+              onTap: () => setState(() => _selectedTab = 0),
+            ),
+          ),
+          Expanded(
+            child: _tabButton(
+              text: "📋 Liste",
+              isSelected: _selectedTab == 1,
+              onTap: () => setState(() => _selectedTab = 1),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _tabButton({required String text, required bool isSelected, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        padding: EdgeInsets.symmetric(vertical: 12),
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? const Color.fromARGB(183, 4, 132, 236) : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
@@ -553,38 +441,35 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  // ========================
+  // Charts Tab
+  // ========================
   Widget _buildChartsTab() {
-    // Vérifier si on a des données pour les graphiques
     final hasChartData = stressScores.isNotEmpty && 
                         motivationScores.isNotEmpty && 
                         satisfactionScores.isNotEmpty;
     
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           if (hasChartData) ...[
-            // Graphique combiné
             _buildCombinedChart(),
-            SizedBox(height: 20),
-            
-            // Graphiques individuels
+            const SizedBox(height: 20),
             _buildSingleChart(
               title: "Évolution du Stress",
               scores: stressScores,
               color: Colors.redAccent,
               icon: Icons.warning_amber,
             ),
-            SizedBox(height: 20),
-            
+            const SizedBox(height: 20),
             _buildSingleChart(
               title: "Évolution de la Motivation",
               scores: motivationScores,
               color: Colors.blueAccent,
               icon: Icons.flash_on,
             ),
-            SizedBox(height: 20),
-            
+            const SizedBox(height: 20),
             _buildSingleChart(
               title: "Évolution de la Satisfaction",
               scores: satisfactionScores,
@@ -592,37 +477,7 @@ class _HistoryPageState extends State<HistoryPage> {
               icon: Icons.sentiment_satisfied,
             ),
           ] else
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40.0),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.bar_chart,
-                      size: 60,
-                      color: Colors.grey[400],
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      "Pas assez de données pour les graphiques",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "Complétez plus de questionnaires pour voir vos tendances",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _buildNoChartData(),
         ],
       ),
     );
@@ -641,9 +496,9 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             Row(
               children: [
-                Icon(Icons.show_chart, color: Colors.deepPurple),
-                SizedBox(width: 8),
-                Text(
+                const Icon(Icons.show_chart, color: Colors.deepPurple),
+                const SizedBox(width: 8),
+                const Text(
                   "Tendances Générales",
                   style: TextStyle(
                     fontSize: 18,
@@ -652,22 +507,21 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               "Comparaison des scores sur les 7 derniers tests",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: Colors.grey,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             
-            // Graphique combiné
             Container(
               height: 200,
               child: LineChart(
                 LineChartData(
-                  gridData: FlGridData(show: true),
+                  gridData: const FlGridData(show: true),
                   titlesData: FlTitlesData(
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -679,9 +533,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
                                     dates[index],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 10,
-                                      color: Colors.grey[600],
+                                      color: Colors.grey,
                                     ),
                                   ),
                                 )
@@ -695,9 +549,9 @@ class _HistoryPageState extends State<HistoryPage> {
                         getTitlesWidget: (value, meta) {
                           return Text(
                             '${value.toInt()}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
-                              color: Colors.grey[600],
+                              color: Colors.grey,
                             ),
                           );
                         },
@@ -706,10 +560,9 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                   borderData: FlBorderData(
                     show: true,
-                    border: Border.all(color: Colors.grey[300]!),
+                    border: Border.all(color: Colors.grey.shade300),
                   ),
                   lineBarsData: [
-                    // Ligne du stress
                     LineChartBarData(
                       spots: stressScores.asMap().entries.map((e) {
                         return FlSpot(e.key.toDouble(), e.value);
@@ -719,7 +572,6 @@ class _HistoryPageState extends State<HistoryPage> {
                       barWidth: 3,
                       belowBarData: BarAreaData(show: false),
                     ),
-                    // Ligne de la motivation
                     LineChartBarData(
                       spots: motivationScores.asMap().entries.map((e) {
                         return FlSpot(e.key.toDouble(), e.value);
@@ -729,7 +581,6 @@ class _HistoryPageState extends State<HistoryPage> {
                       barWidth: 3,
                       belowBarData: BarAreaData(show: false),
                     ),
-                    // Ligne de la satisfaction
                     LineChartBarData(
                       spots: satisfactionScores.asMap().entries.map((e) {
                         return FlSpot(e.key.toDouble(), e.value);
@@ -744,16 +595,15 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
             
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             
-            // Légende
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _legendItem(color: Colors.redAccent, text: "Stress"),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 _legendItem(color: Colors.blueAccent, text: "Motivation"),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 _legendItem(color: Colors.greenAccent, text: "Satisfaction"),
               ],
             ),
@@ -784,19 +634,18 @@ class _HistoryPageState extends State<HistoryPage> {
             Row(
               children: [
                 Icon(icon, color: color),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             
-            // Bar chart simple
             Container(
               height: 150,
               child: Row(
@@ -818,18 +667,18 @@ class _HistoryPageState extends State<HistoryPage> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         index < dates.length ? dates[index] : '',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
-                          color: Colors.grey[600],
+                          color: Colors.grey,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         '${score.toInt()}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
@@ -837,6 +686,40 @@ class _HistoryPageState extends State<HistoryPage> {
                     ],
                   );
                 }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoChartData() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40.0),
+        child: Column(
+          children: [
+            Icon(
+              Icons.bar_chart,
+              size: 60,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Pas assez de données pour les graphiques",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Complétez plus de questionnaires pour voir vos tendances",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
               ),
             ),
           ],
@@ -856,26 +739,27 @@ class _HistoryPageState extends State<HistoryPage> {
             borderRadius: BorderRadius.circular(3),
           ),
         ),
-        SizedBox(width: 6),
+        const SizedBox(width: 6),
         Text(
           text,
-          style: TextStyle(fontSize: 12),
+          style: const TextStyle(fontSize: 12),
         ),
       ],
     );
   }
 
+  // ========================
+  // List Tab
+  // ========================
   Widget _buildListTab() {
     return ListView.builder(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       itemCount: history.length,
       itemBuilder: (_, i) {
         final item = history[i];
         final ai = item["ai_report"] ?? {};
         final dateStr = item["created_at"]?.toString() ?? '';
-        final formattedDate = dateStr.length >= 10 
-            ? "${dateStr.substring(8, 10)}/${dateStr.substring(5, 7)}/${dateStr.substring(0, 4)}"
-            : dateStr;
+        final formattedDate = _formatDate(dateStr);
 
         final stressScore = _safeExtractScoreString(ai, "stress_score");
         final motivationScore = _safeExtractScoreString(ai, "motivation_score");
@@ -883,7 +767,7 @@ class _HistoryPageState extends State<HistoryPage> {
         final riskLevel = ai["risk_level"]?.toString() ?? "unknown";
 
         return Container(
-          margin: EdgeInsets.only(bottom: 16),
+          margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(15),
@@ -891,7 +775,7 @@ class _HistoryPageState extends State<HistoryPage> {
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 10,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -899,10 +783,7 @@ class _HistoryPageState extends State<HistoryPage> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(15),
-              onTap: () {
-                // Navigation vers le détail du résultat
-                // Navigator.push(...);
-              },
+              onTap: () {},
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -914,21 +795,21 @@ class _HistoryPageState extends State<HistoryPage> {
                         Row(
                           children: [
                             Container(
-                              padding: EdgeInsets.all(6),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: Colors.deepPurple.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.assignment,
                                 size: 20,
                                 color: Colors.deepPurple,
                               ),
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             Text(
                               "Test #${item['id'] ?? i + 1}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -936,7 +817,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           ],
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: _riskColor(riskLevel),
@@ -944,7 +825,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           ),
                           child: Text(
                             riskLevel.toUpperCase(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -954,9 +835,9 @@ class _HistoryPageState extends State<HistoryPage> {
                       ],
                     ),
                     
-                    SizedBox(height: 12),
-                    Divider(height: 1, color: Colors.grey[200]),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
+                    const Divider(height: 1, color: Colors.grey),
+                    const SizedBox(height: 12),
                     
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -982,22 +863,21 @@ class _HistoryPageState extends State<HistoryPage> {
                       ],
                     ),
                     
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     
                     Row(
                       children: [
-                        Icon(Icons.calendar_today,
-                            size: 14, color: Colors.grey[500]),
-                        SizedBox(width: 6),
+                        const Icon(Icons.calendar_today,
+                            size: 14, color: Colors.grey),
+                        const SizedBox(width: 6),
                         Text(
                           formattedDate.isNotEmpty ? "Le $formattedDate" : "Date inconnue",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[600],
+                            color: Colors.grey,
                           ),
                         ),
-                        Spacer(),
-          
+                        const Spacer(),
                       ],
                     ),
                   ],
@@ -1008,6 +888,16 @@ class _HistoryPageState extends State<HistoryPage> {
         );
       },
     );
+  }
+
+  String _formatDate(String dateStr) {
+    if (dateStr.length >= 10) {
+      final year = dateStr.substring(0, 4);
+      final month = dateStr.substring(5, 7);
+      final day = dateStr.substring(8, 10);
+      return "$day/$month/$year";
+    }
+    return dateStr;
   }
 
   Widget _scoreCircle({
@@ -1032,7 +922,7 @@ class _HistoryPageState extends State<HistoryPage> {
             Column(
               children: [
                 Icon(icon, size: 20, color: color),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   value,
                   style: TextStyle(
@@ -1045,12 +935,12 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
           ],
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 11,
-            color: Colors.grey[600],
+            color: Colors.grey,
           ),
         ),
       ],
@@ -1063,5 +953,203 @@ class _HistoryPageState extends State<HistoryPage> {
     if (riskLower.contains("medium")) return Colors.orange;
     if (riskLower.contains("low")) return Colors.green;
     return Colors.blueGrey;
+  }
+
+  // ========================
+  // Empty State
+  // ========================
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.history_toggle_off,
+            size: 80,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            "Aucun résultat pour le moment",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            "Complétez un questionnaire pour voir vos résultats",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ========================
+  // Drawer
+  // ========================
+  Widget _buildDrawer() {
+    final userName = userProfile['name'] ?? 'Utilisateur';
+    final userEmail = userProfile['email'] ?? '';
+    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'U';
+    final userRole = userProfile['role'] == 'admin' ? 'Administrateur' : 'Utilisateur';
+
+    return Drawer(
+      child: Container(
+        color: Colors.white,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            // En-tête du drawer avec profil
+            Container(
+              height: 200,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.blue.shade700, Colors.blue.shade900],
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  loadingProfile
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          child: Text(
+                            userInitial,
+                            style: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                  const SizedBox(height: 16),
+                  Text(
+                    userName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (userEmail.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      userEmail,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      userRole,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Menu de navigation
+            _drawerMenuItem(
+              icon: Icons.history,
+              title: "Historique",
+              isSelected: true,
+              onTap: () => Navigator.pop(context),
+            ),
+          
+            
+            _drawerMenuItem(
+              icon: Icons.person,
+              title: "Mon Profil",
+              isSelected: false,
+              onTap: () {
+                Navigator.pop(context);
+                _navigateToSettings(context);
+              },
+            ),
+
+            const Divider(height: 32, thickness: 1),
+
+            // Section système
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                "Compte",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                "Déconnexion",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _logout(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _drawerMenuItem({
+    required IconData icon,
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isSelected ? Colors.blue : Colors.grey[700],
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? Colors.blue : Colors.grey[800],
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      tileColor: isSelected ? Colors.blue.shade50 : Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      onTap: onTap,
+    );
   }
 }

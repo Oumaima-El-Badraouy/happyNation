@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\API;
-
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,17 +77,33 @@ $gemini = Http::withHeaders([
     $cleanJson = preg_replace('/```json|```/', '', $text);
 
     // 6) Store AI result in ai_reports table
-    AiReport::create([
-        'response_id' => $response->id,
-        'diagnostic_json' => $cleanJson,
-        'model' => 'gemini-2.5-flash'
-    ]);
+    // 6) Store AI result in ai_reports table
+$aiReport = AiReport::create([
+    'response_id' => $response->id,
+    'diagnostic_json' => $cleanJson,
+    'model' => 'gemini-2.5-flash'
+]);
 
-    return response()->json([
-        "message" => "Response saved successfully",
-        "response_id" => $response->id,
-        "ai_report" => json_decode($cleanJson)
+// 7) Extract recommendations and store for admin
+$aiData = json_decode($cleanJson, true);
+if(isset($aiData['recommendations'])){
+    DB::table('admin_recommendations')->insert([
+        'response_id' => $response->id,
+        'recommendations' => json_encode($aiData['recommendations']),
+        'created_at' => now(),
+        'updated_at' => now()
     ]);
+}
+
+// 8) Return response to user WITHOUT recommendations
+unset($aiData['recommendations']);
+
+return response()->json([
+    "message" => "Response saved successfully",
+    "response_id" => $response->id,
+    "ai_report" => $aiData
+]);
+
 }
 
 
@@ -100,15 +116,16 @@ $gemini = Http::withHeaders([
             "contents" => [[
                 "parts" => [[
                     "text" => "Analyze employee well-being using these answers:\n" . json_encode($answers) .
-                        "\nReturn JSON with the following fields:
-                        {
-                          \"stress_score\": 0-100,
-                          \"motivation_score\": 0-100,
-                          \"satisfaction_score\": 0-100,
-                          \"risk_level\": \"low | medium | high\",
-                          \"summary\": \"string\",
-                          \"recommendations\": [\"string\", ...]
-                        }"
+    "\nReturn JSON with the following fields:\n" .
+    json_encode([
+        "stress_score" => "0-100",
+        "motivation_score" => "0-100",
+        "satisfaction_score" => "0-100",
+        "risk_level" => "low | medium | high",
+        "summary" => "string (write directly to the employee, friendly and motivating. Example: 'You seem a bit stressed, try taking small breaks and focusing on your goals.')",
+        "recommendations" => ["string", "..."]
+    ])
+
                 ]]
             ]]
         ];

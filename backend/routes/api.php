@@ -18,6 +18,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
 });
+Route::middleware('auth:api')->group(function() {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::put('/me/update', [AuthController::class, 'update']);
+});
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/questions', [QuestionController::class, 'index']);

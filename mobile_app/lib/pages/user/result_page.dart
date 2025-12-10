@@ -181,15 +181,7 @@ class ResultPage extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Section recommandations
-            Text(
-              "Recommandations",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
-            ),
+         
             const SizedBox(height: 12),
 
             ...recommendations.map((recommendation) {
@@ -275,23 +267,7 @@ class ResultPage extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      "/",
-                      (route) => false,
-                    );
-                  },
-                  child: const Text(
-                    "Retour à l'accueil",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-              ],
+             ],
             ),
 
             const SizedBox(height: 40),

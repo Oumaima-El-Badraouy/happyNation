@@ -86,4 +86,38 @@ $users = User::where('role', 'user')->orderBy('name')->get();
 
         return response()->json(['message'=>'Logged out successfully']);
     }
+
+    public function me(Request $request)
+    {
+        $user = Auth::user(); // token automatically verified
+
+        return response()->json([
+            'status' => true,
+            'user' => $user
+        ]);
+    }
+
+    // ================================
+    // 🔹 2. Update User Info
+    // ================================
+    public function update(Request $request)
+{
+    $user = Auth::user();
+
+    $data = $request->only(['name','email','password']);
+
+    if (isset($data['password'])) {
+        $data['password'] = bcrypt($data['password']);
+    }
+
+    $user->fill($data);
+    $user->save(); // no Intelephense error
+
+    return response()->json([
+        'status' => true,
+        'message' => 'User updated',
+        'user' => $user
+    ]);
+}
+
 }

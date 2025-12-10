@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
-
+import 'pages/user/manage_profile_page.dart';
 import 'pages/auth/login_page.dart';
 import 'pages/user/questions_page.dart';
 import 'pages/user/result_page.dart';
@@ -54,6 +54,8 @@ class HappyNationApp extends StatelessWidget {
 
           // User pages
           "/questions": (context) => const QuestionsPage(),
+          "/settings": (context) => const SettingsPage(),
+
           "/user/result": (context) => const ResultPage(),
           "/responses/history": (context) => const HistoryPage(),
 

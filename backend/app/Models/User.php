@@ -10,10 +10,13 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    
+
     use HasApiTokens, HasFactory, Notifiable;
     /**
  * @method \Laravel\Passport\PersonalAccessTokenResult createToken(string $name, array $scopes = [])
+ */
+    /**
+ * @method bool update(array $attributes = [], array $options = [])
  */
     protected $fillable = ['name','email','password','role'];
 
@@ -27,5 +30,5 @@ class User extends Authenticatable
     public function responses() {
         return $this->hasMany(Response::class);
     }
-    
+
 }
